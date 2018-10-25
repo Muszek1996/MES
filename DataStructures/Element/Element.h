@@ -8,8 +8,11 @@
 
 class Element {
   int ID[4];
+  int id;
 public:
-    Element(int a,int b,int c,int d);
+    Element(int id,int a,int b,int c,int d);
+    void print();
+    void printPlus1();
 };
 
 

@@ -8,8 +8,9 @@
 
 class Node {
     double x,y,t0;
+    int id;
 public:
-    Node(double x, double y, double t0);
+    Node(int id,double x, double y, double t0);
 
     double getX() const;
 
@@ -22,6 +23,9 @@ public:
     double getT0() const;
 
     void setT0(double t0);
+
+    void print();
+    void printPlus1();
 };
 
 

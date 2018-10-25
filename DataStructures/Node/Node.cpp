@@ -3,8 +3,10 @@
 //
 
 #include "Node.h"
+#include <iostream>
+using namespace std;
 
-Node::Node(double x, double y, double z) : x(x), y(y), t0(z) {
+Node::Node(int id,double x, double y, double z) : id(id), x(x), y(y), t0(z) {
 
 }
 
@@ -30,4 +32,12 @@ double Node::getT0() const {
 
 void Node::setT0(double t0) {
     Node::t0 = t0;
+}
+
+void Node::print() {
+    cout << "Index: "<< id << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0 << endl;
+}
+
+void Node::printPlus1() {
+    cout << "Index: "<< id+1 << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0 << endl;
 }
