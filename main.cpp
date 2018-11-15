@@ -48,7 +48,7 @@ int main() {
 
     Grid grid(node,element);
 
-    grid.printPlus1();
+    grid.print();
 
 
 
