@@ -10,10 +10,13 @@
 #include "../Element/Element.h"
 
 class Grid {
-    Node ** nodes;
+    int nH,nL,nodeCount,elementsCount;
+    double H,L,t0;
+public :Node ** nodes;
     Element ** elements;
 public:
-    Grid(Node **nodes, Element **elements);
+    Grid(int nH, int nL, double H, double L, double t0);
+
     void print();
     void printPlus1();
 

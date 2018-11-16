@@ -3,6 +3,7 @@
 #include "DataStructures/Node/Node.h"
 #include "DataStructures/Element/Element.h"
 #include "DataStructures/Grid/Grid.h"
+#include "Jacobian/Jacobian.h"
 
 
 int main() {
@@ -20,35 +21,11 @@ int main() {
     << "nL=" << nL << endl
     << "t0=" << t0 << endl;
 
-    int nodeCount = static_cast<int>(nH*nL);
-    int elementCount = static_cast<int>((nH-1)*(nL-1));
-    double stepH = H/(nH-1);
-    double stepL = L/(nL-1);
-    int nLminus1 = nL-1;
-    int nHminus1 = nH-1;
+    Grid grid(nH,nL,H,L,t0);
 
-    Node ** node = new Node*[nodeCount+1];
+    //grid.print();
 
-    for(int i = 0;i<nL;i++)
-    for(int j = 0;j<nH;j++){
-        int itr = j+(i*(nH));
-        node[itr] = new Node(itr,i*stepL,j*stepH,t0);
-    }
-    //node[nodeCount+1] = nullptr;
-
-    Element ** element = new Element*[elementCount+1];
-
-    for(int i=0;i<nLminus1;i++)
-    for(int j=0;j<nHminus1;j++){
-        int itr = j+(i*(nHminus1));
-        element[itr] = new Element(itr,itr+i,itr+i+nH,itr+i+nH+1,itr+i+1);
-    }
-    //element[elementCount+1]= nullptr;
-
-
-    Grid grid(node,element);
-
-    grid.print();
+    Jacobian *jacobian = new Jacobian(*grid.nodes[0],*grid.nodes[2],*grid.nodes[3],*grid.nodes[1]);
 
 
 
