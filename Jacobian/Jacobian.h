@@ -17,6 +17,12 @@ class Jacobian {
     double macierzJakobiego[4][4];
     double detJ[4];
     double macierzJakobiego2[4][4];
+    double dN_dx[4][4],dN_dy[4][4];
+    double dN_dxT[4][4][4],dN_dyT[4][4][4];
+    double dN_dxTConduvitiy[4][4][4];
+    double conductivityK = 30;
+    double MacierzH[4][4];
+
 public:
     Jacobian(Node a,Node b,Node c, Node d);
 

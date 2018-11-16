@@ -50,7 +50,7 @@ Jacobian::Jacobian(Node a,Node b,Node c, Node d) {
     }std::cout << endl << endl;
 
 
-    for(int i = 0;i<4;i++){
+    for(int i = 0;i<4;i++){ /// Pochodne funkcji kształtu względem eta i ksi
         dN_dksi[0][i] = -0.25*(1-eta[i]);
         dN_dksi[1][i] = 0.25*(1-eta[i]);
         dN_dksi[2][i] = 0.25*(1+eta[i]);
@@ -109,6 +109,67 @@ Jacobian::Jacobian(Node a,Node b,Node c, Node d) {
         cout << macierzJakobiego2[i][j] << "\t";
         }cout << endl;
     }cout << endl;
+
+    for(int i = 0;i<4;i++) {
+        for (int j = 0; j < 4; j++) {
+        dN_dx[i][j] = dN_dksi[i][j]*macierzJakobiego2[0][i] + dN_deta[i][j]*macierzJakobiego2[1][i];
+        dN_dy[i][j] = dN_dksi[i][j]*macierzJakobiego2[2][i] + dN_deta[i][j]*macierzJakobiego2[3][i];
+        }
+    }
+
+    for(int i = 0;i<4;i++) {
+        for (int j = 0; j < 4; j++) {
+            cout << dN_dx[j][i] << "\t\t"; //zamienione indeksy do wypisania
+        }cout << endl;
+    }cout << endl;
+
+    for(int i = 0;i<4;i++) {
+        for (int j = 0; j < 4; j++) {
+            cout << dN_dy[j][i] << "\t\t";//zamienione indeksy do wypisania
+        }cout << endl;
+    }cout << endl;
+
+    cout << "1 2 3 4pc dx" << endl;
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            for(int k=0;k<4;k++){
+                dN_dxT[i][j][k] = dN_dx[j][i]*dN_dx[k][i]*detJ[i];
+                dN_dyT[i][j][k] = dN_dy[j][i]*dN_dy[k][i]*detJ[i];
+                cout << dN_dxT[i][j][k] << "\t";
+            }cout << endl;
+        }cout << endl;
+    }
+
+    cout << "1 2 3 4pc dy" << endl;
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            for(int k=0;k<4;k++){
+                cout << dN_dyT[i][j][k] << "\t";
+            }cout << endl;
+        }cout << endl;
+    }
+
+    cout << "1 2 3 4pc conductivity" << endl;
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            for(int k=0;k<4;k++){
+                dN_dxTConduvitiy[i][j][k] = (dN_dxT[i][j][k]+dN_dyT[i][j][k])*conductivityK;
+                cout <<  dN_dxTConduvitiy[i][j][k] << "\t";
+            }cout << endl;
+        }cout << endl;
+    }
+
+
+    cout << "MACIERZ H" << endl;
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            MacierzH[i][j]=0;
+            for(int k=0;k<4;k++){
+               MacierzH[i][j] += dN_dxTConduvitiy[k][j][i];
+
+            }cout << MacierzH[i][j]<< "\t";
+        }cout << endl;
+    }
 
 
 }
