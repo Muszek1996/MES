@@ -4,6 +4,7 @@
 
 #include "Node.h"
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 Node::Node(int id,double x, double y, double z) : id(id), x(x), y(y), t0(z) {
@@ -35,9 +36,14 @@ void Node::setT0(double t0) {
 }
 
 void Node::print() {
-    cout << "Index: "<< id << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0 << endl;
+
+    cout <<std::left
+    << "Index: "<< id << "(" << x << ","<< y << ")t0:" << t0 << "\t\t";
 }
 
 void Node::printPlus1() {
-    cout << "Index: "<< id+1 << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0 << endl;
+    cout << "Index: "<< id+1 << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0;
 }
+
+Node::Node() {}
+

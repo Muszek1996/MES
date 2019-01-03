@@ -12,8 +12,10 @@
 class Grid {
     Node ** nodes;
     Element ** elements;
+    int nodeCount,elementsCount;
+    int nH,nL;                  // nodes per Height and Length;
 public:
-    Grid(Node **nodes, Element **elements);
+    Grid(Node **nodes, Element **elements,int,int);
     void print();
     void printPlus1();
 

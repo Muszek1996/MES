@@ -12,6 +12,8 @@ class Node {
 public:
     Node(int id,double x, double y, double t0);
 
+    Node();
+
     double getX() const;
 
     void setX(double x);

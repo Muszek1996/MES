@@ -27,26 +27,27 @@ int main() {
     int nLminus1 = nL-1;
     int nHminus1 = nH-1;
 
-    Node ** node = new Node*[nodeCount+1];
+
+
+    Node** nodes = new Node*[nodeCount];
+
 
     for(int i = 0;i<nL;i++)
     for(int j = 0;j<nH;j++){
         int itr = j+(i*(nH));
-        node[itr] = new Node(itr,i*stepL,j*stepH,t0);
+        nodes[itr] = new Node(itr+1,i*stepL,j*stepH,t0);
     }
-    //node[nodeCount+1] = nullptr;
 
-    Element ** element = new Element*[elementCount+1];
+
+    Element ** elements = new Element*[elementCount];
 
     for(int i=0;i<nLminus1;i++)
     for(int j=0;j<nHminus1;j++){
         int itr = j+(i*(nHminus1));
-        element[itr] = new Element(itr,itr+i,itr+i+nH,itr+i+nH+1,itr+i+1);
+        elements[itr] = new Element(itr,itr+i,itr+i+nH,itr+i+nH+1,itr+i+1);
     }
-    //element[elementCount+1]= nullptr;
 
-
-    Grid grid(node,element);
+    Grid grid(nodes,elements,nH,nL);
 
     grid.print();
 
