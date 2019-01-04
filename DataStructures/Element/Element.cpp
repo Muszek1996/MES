@@ -6,17 +6,37 @@
 #include <iostream>
 using namespace std;
 
-Element::Element(int id,int a,int b,int c,int d) : id(id){
-    ID[0]= a;
-    ID[1]= b;
-    ID[2]= c;
-    ID[3]= d;
+Element::Element(int id,Node* a,Node* b,Node* c,Node* d,bool *bc) : id(id){
+    node[0]= *a;
+    node[1]= *b;
+    node[2]= *c;
+    node[3]= *d;
+    for(int i =0;i<4;i++){
+        this->bc[i]= bc[i];
+    }
+
 }
 
 void Element::print() {
-    cout << "Index:" << id << "\t[0]:" << ID[0] << "\t[1]:" << ID[1] << "\t[2]:" << ID[2] << "\t[3]:" << ID[3] << endl;
+    cout << "Index:" << id << "\t[0]:" << node[0].getId() << "\t[1]:" << node[1].getId() << "\t[2]:" << node[2].getId() << "\t[3]:" << node[3].getId() << endl;
 }
 
 void Element::printPlus1() {
-    cout << "Index:" << id+1 << "\t[0]:" << ID[0]+1 << "\t[1]:" << ID[1]+1 << "\t[2]:" << ID[2]+1 << "\t[3]:" << ID[3]+1 << endl;
+    cout << "Index:" << id+1 << "\t[0]:" << node[0].getId()+1 << "\t[1]:" << node[1].getId()+1 << "\t[2]:" << node[2].getId()+1 << "\t[3]:" << node[3].getId()+1 << endl;
+}
+
+double *Element::getXes() {
+    double * Xes = new double[4];
+    for(int i = 0;i<4;i++){
+        Xes[i]= node[i].getX();
+    }
+    return Xes;
+}
+
+double *Element::getYes() {
+    double * Yes = new double[4];
+    for(int i = 0;i<4;i++){
+        Yes[i]= node[i].getY();
+    }
+    return Yes;
 }

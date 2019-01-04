@@ -47,3 +47,7 @@ void Node::printPlus1() {
 
 Node::Node() {}
 
+int Node::getId() const {
+    return id;
+}
+

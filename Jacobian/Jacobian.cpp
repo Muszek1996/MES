@@ -4,17 +4,16 @@
 
 #include <iostream>
 #include "Jacobian.h"
+#include "../ShapeFunctions/shapeF.h"
+#include <math.h>
+#include "../DataStructures/Node/Node.h"
+#include "../DataStructures/Element/Element.h"
 using namespace std;
 
 
-/*!
-* Definicja 4 funkcji kształtu w każdym z 4 punktów całkowania;
-* 𝑁1=0.25(1−𝜀)(1−𝜇)
-* 𝑁2=0.25(1+𝜀)(1−𝜇)
-* 𝑁3=0.25(1+𝜀)(1+𝜇)
-* 𝑁4=0.25(1−𝜀)(1+𝜇)
-*/
+
 Jacobian::Jacobian(Node a,Node b,Node c, Node d) {
+
     double x[4] = {a.getX(),b.getX(),c.getX(),d.getX()};
     double y[4] = {a.getY(),b.getY(),c.getY(),d.getY()};
 
@@ -24,11 +23,8 @@ Jacobian::Jacobian(Node a,Node b,Node c, Node d) {
     }cout << endl;
 
 
-    for(int punktCalkowania = 0;punktCalkowania<4; punktCalkowania++){
-        N[punktCalkowania][0] = 0.25*(1-ksi[punktCalkowania])*(1-eta[punktCalkowania]);
-        N[punktCalkowania][1] = 0.25*(1+ksi[punktCalkowania])*(1-eta[punktCalkowania]);
-        N[punktCalkowania][2] = 0.25*(1+ksi[punktCalkowania])*(1+eta[punktCalkowania]);
-        N[punktCalkowania][3] = 0.25*(1-ksi[punktCalkowania])*(1+eta[punktCalkowania]);
+    for(int pc = 0;pc<4; pc++){
+        N[pc] = shapeF::Ni(ksi[pc], eta[pc]);
     }
 
     for(int i =0;i<4;i++){
@@ -170,6 +166,12 @@ Jacobian::Jacobian(Node a,Node b,Node c, Node d) {
             }cout << MacierzH[i][j]<< "\t";
         }cout << endl;
     }
+
+
+}
+
+Jacobian::Jacobian(Element el){
+
 
 
 }

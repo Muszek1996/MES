@@ -10,6 +10,8 @@ class Node {
     double x,y,t0;
     int id;
 public:
+    int getId() const;
+
     Node(int id,double x, double y, double t0);
 
     Node();
