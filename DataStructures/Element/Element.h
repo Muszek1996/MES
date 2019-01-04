@@ -10,6 +10,11 @@ class Element {
   Node node[4];
   int id;
 public:
+    int getId() const;
+    double * getTemps();
+public:
+    const Node *getNode() const;
+
     bool bc[4];
     double *getXes();
     double *getYes();

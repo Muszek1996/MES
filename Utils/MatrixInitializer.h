@@ -9,7 +9,7 @@ namespace MatrixInitializer{
     static double ** init(int x,int y){
         auto ** matrix = new double*[x];
         for(int i = 0;i<y;i++){
-            matrix[i] = new double[4];
+            matrix[i] = new double[y];
         }
         return matrix;
     }

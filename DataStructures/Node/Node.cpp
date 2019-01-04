@@ -37,12 +37,12 @@ void Node::setT0(double t0) {
 
 void Node::print() {
 
-    cout <<std::left
-    << "Index: "<< id << "(" << x << ","<< y << ")t0:" << t0 << "\t\t";
+    cout <<std::left << std::setprecision(3)
+    << "I: "<< id << "(" << x << ","<< y << ")t0:" << t0 << "\t";
 }
 
 void Node::printPlus1() {
-    cout << "Index: "<< id+1 << "\t(" << x << "\t,\t"<< y << ")\t\tt0:" << t0;
+    cout << "Index: "<< id+1 << "\t(" << x << "\t,\t"<< y << ")\tt0:" << t0;
 }
 
 Node::Node() {}

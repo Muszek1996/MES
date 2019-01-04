@@ -8,22 +8,43 @@
 #include "CMatrix/MatrixC.h"
 #include "BoundaryConditions/BoundC.h"
 #include "VectorP/VectorP.h"
+#include "TempVector/TVector.h"
+#include "Utils/GausianElimination.h"
+#include "Utils/MatrixInitializer.h"
 
 
 int main() {
 
     std::map<string,double> inputData = FS::read();
+    double t0 = inputData.find("t0")->second;
+    double simulation_time = inputData.find("simulation_time")->second;
+    double simulation_step = inputData.find("simulation_step")->second;
+    double ambient_temp = inputData.find("ambient_temp")->second;
+    double alfa = inputData.find("alfa")->second;
     double H = inputData.find("H")->second;
     double L = inputData.find("L")->second;
     int nH = static_cast<int>(inputData.find("nH")->second);
     int nL = static_cast<int>(inputData.find("nL")->second);
-    double t0 = inputData.find("t0")->second;
+    double specific_heat = inputData.find("specific_heat")->second;
+    double conductivity = inputData.find("conductivity")->second;
+    double density = inputData.find("density")->second;
+
     cout << "FILE INPUT DATA \n"
+    << "t0=" << t0 << endl
+    << "simulation_time=" << simulation_time << endl
+    << "simulation_step=" << simulation_step << endl
+    << "ambient_temp=" << ambient_temp << endl
+    << "alfa=" << alfa << endl
     << "H=" << H << endl
     << "L=" << L << endl
     << "nH=" << nH << endl
     << "nL=" << nL << endl
-    << "t0=" << t0 << endl;
+    << "specific_heat=" << specific_heat << endl
+    << "conductivity=" << conductivity << endl
+    << "density=" << density << endl;
+
+
+
 
     int nodeCount = static_cast<int>(nH*nL);
     int elementCount = static_cast<int>((nH-1)*(nL-1));
@@ -36,13 +57,11 @@ int main() {
 
     Node** nodes = new Node*[nodeCount];
 
-
     for(int i = 0;i<nL;i++)
     for(int j = 0;j<nH;j++){
         int itr = j+(i*(nH));
         nodes[itr] = new Node(itr+1,i*stepL,j*stepH,t0);
     }
-
 
     Element ** elements = new Element*[elementCount];
 
@@ -60,26 +79,144 @@ int main() {
 
     Grid grid(nodes,elements,nH,nL);
 
-    grid.print();
-
-   // Jacobian jcb = Jacobian(Node(0,0,0,20),Node(0,0.25,0,20),Node(0,0.25,0.25,20),Node(0,0,0.25,20));
+   // grid.print();
 
 
-    Element *el = new Element(0,new Node(0,0,0,20),new Node(0,0.025,0,20),new Node(0,0.025,0.025,20),new Node(0,0,0.025,20),new bool[4]{1,0,0,0});
-    double ** matrixH = HMatrix::count(*el,30);
-    double ** matrixC = MatrixC::count(*el,700,7800);
+    double cMatrixGlobal[nodeCount][nodeCount];
+    double **hMatrixGlobal = MatrixInitializer::init(nodeCount,nodeCount);
 
-
-   double**matrixH_BC =  BoundC::count(*el,25);
-
-    for(int i =0;i<4;i++) {
-        for (int j = 0; j < 4; j++) {
-            std::cout << matrixH_BC[i][j] << "\t";
+    for(int i = 0;i<nodeCount;i++)
+        for(int j = 0;j<nodeCount;j++) {
+            cMatrixGlobal[i][j] = 0;
+            hMatrixGlobal[i][j] = 0;
         }
-        std::cout << std::endl;
+
+    double pVector[nodeCount];
+
+
+
+    for(int i = 0;i<elementCount;i++){
+        Element el = *elements[i];
+        double ** matrixHandBC = HMatrix::count(*elements[i],conductivity);
+        double ** matrixC_dT = MatrixC::count(*elements[i],specific_heat,density);
+        double ** matrixH_BC = BoundC::count(*elements[i],alfa);
+        double * vectorP = VectorP::count(*elements[i],alfa,ambient_temp);
+        double * vectorT = TVector::count(*elements[i]);
+        double * t0Vector = el.getTemps();
+
+
+        // matrixHandBC = MatrixH + H_BC + C/dT
+
+        for (int k = 0; k < 4; k++) {
+            for (int j = 0; j < 4; j++) {
+                matrixHandBC[k][j] += matrixH_BC[k][j];
+                matrixC_dT[k][j] /= simulation_step;
+                matrixHandBC[k][j] += matrixC_dT[k][j];
+            }
+        }
+
+
+
+        double *pCTauT0 = new double[4];
+        for (int k = 0; k < 4; k++) {
+            pCTauT0[k] = 0;
+            for (int j = 0; j < 4; j++) {
+                pCTauT0[k]+=matrixC_dT[k][j]*t0Vector[k];
+            }
+            pCTauT0[k]+=vectorP[k];
+        }
+
+
+
+
+        for (int k = 0; k < 4; k++) {
+            for (int j = 0; j < 4; j++) {
+                int node1ID = el.getNode()[k].getId()-1;
+                int node2ID = el.getNode()[j].getId()-1;
+
+                double valC = matrixC_dT[k][j];
+                double valH = matrixHandBC[k][j];
+                cMatrixGlobal[node1ID][node2ID] += valC;
+                hMatrixGlobal[node1ID][node2ID] += valH;
+            }
+            pVector[el.getNode()[k].getId()-1] += pCTauT0[k];
+        }
     }
 
-    double *vectorP = VectorP::count(*el,25,t0);
-    double vectorrP[4] = {vectorP[0],vectorP[1],vectorP[2],vectorP[3]};
+    double * x = GausianElimination::solve(hMatrixGlobal,pVector,nodeCount);
+
+    for (int k = 0; k < 16; k++)
+        cout << x[k]<< '\t';
+
+    for(double tau = simulation_step;tau<=simulation_time;tau+=simulation_step){
+
+        for(int j = 0;j<nodeCount;j++)
+            pVector[j] = 0;
+
+            for (int i = 0; i < elementCount; i++) {
+                Element el = *elements[i];
+                double **matrixC_dT = MatrixC::count(*elements[i], specific_heat, density);
+                double *vectorP = VectorP::count(*elements[i], alfa, ambient_temp);
+                double *vectorT = TVector::count(*elements[i]);
+                double *t0Vector = el.getTemps();
+
+
+                // matrixHandBC = MatrixH + H_BC + C/dT
+
+                for (int k = 0; k < 4; k++) {
+                    for (int j = 0; j < 4; j++) {
+                        matrixC_dT[k][j] /= tau;
+                    }
+                }
+
+
+                double *pCTauT0 = new double[4];
+                for (int k = 0; k < 4; k++) {
+                    pCTauT0[k] = 0;
+                    for (int j = 0; j < 4; j++) {
+                        pCTauT0[k] += matrixC_dT[k][j] * t0Vector[k];
+                    }
+                    pCTauT0[k] += vectorP[k];
+                }
+
+
+                for (int k = 0; k < 4; k++) {
+                    for (int j = 0; j < 4; j++) {
+                        int node1ID = el.getNode()[k].getId() - 1;
+                        int node2ID = el.getNode()[j].getId() - 1;
+                        double valC = matrixC_dT[k][j];
+                    }
+                    el.getNode()->print();
+                    int id = el.getNode()[k].getId()-1;
+                    pVector[id] += pCTauT0[k];
+                }
+            }
+
+
+
+//    cout << endl << endl;
+//    for (int k = 0; k < 16; k++) {
+//        for (int j = 0; j < 16; j++) {
+//            cout << hMatrixGlobal[k][j] << ' ';
+//        }
+//        cout << endl;
+//    }
+//    cout << endl << endl;
+//    for (int k = 0; k < 16; k++)
+//        cout << pVector[k]<< '\t';
+
+    cout << endl;
+    double * x = GausianElimination::solve(hMatrixGlobal,pVector,nodeCount);
+
+    for (int k = 0; k < 16; k++)
+        cout << x[k]<< '\t';
+
+
+    for (int k = 0; k < nodeCount; k++)
+        nodes[k]->setT0(x[k]);
+
+    //grid.print();
+
+    }
     return 0;
 }

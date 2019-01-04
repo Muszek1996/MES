@@ -40,3 +40,19 @@ double *Element::getYes() {
     }
     return Yes;
 }
+
+const Node *Element::getNode() const {
+    return node;
+}
+
+int Element::getId() const {
+    return id;
+}
+
+double *Element::getTemps() {
+    double * tempsVector = new double[4];
+    for(int i = 0;i<4;i++){
+        tempsVector[i] = node[i].getT0();
+    }
+    return tempsVector;
+}

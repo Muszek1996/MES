@@ -9,7 +9,7 @@
 
 class HMatrix {
 public:
-    static double **count(Element el,double);
+    static double **count(Element el,double conductivity);
 };
 
 
