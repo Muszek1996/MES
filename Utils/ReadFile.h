@@ -14,7 +14,7 @@ using namespace std;
 namespace FS{
     std::map<string,double> read(){
         ifstream myfile;
-        myfile.open ("../dane.txt", ios::in);
+        myfile.open ("../dane2.txt", ios::in);
         string buffer;
 
         std::map<string,double> data = std::map<string,double>();
